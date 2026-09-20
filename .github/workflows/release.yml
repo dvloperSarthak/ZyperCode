@@ -1,0 +1,112 @@
+name: Auto Release & Update
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (leave blank to auto-increment)'
+        required: false
+        default: ''
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'windows-latest'
+            args: '--target x86_64-pc-windows-gnu'
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 11
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-gnu
+
+      - name: Auto-Increment Version
+        id: versioning
+        shell: pwsh
+        run: |
+          $pkgPath = "terax-ai-main/package.json"
+          $pkg = Get-Content $pkgPath -Raw | ConvertFrom-Json
+          $current = $pkg.version
+          
+          $customVersion = "${{ github.event.inputs.version }}"
+          if ([string]::IsNullOrWhiteSpace($customVersion)) {
+            $parts = $current.Split(".")
+            $major = [int]$parts[0]
+            $minor = [int]$parts[1]
+            $patch = [int]$parts[2] + 1
+            $newVersion = "$major.$minor.$patch"
+          } else {
+            $newVersion = $customVersion.TrimStart("v")
+          }
+          
+          Write-Host "Bumping version from $current to $newVersion"
+          
+          # Update package.json
+          $pkg.version = $newVersion
+          $pkg | ConvertTo-Json -Depth 10 | Set-Content $pkgPath
+          
+          # Update tauri.conf.json
+          $tauriPath = "terax-ai-main/src-tauri/tauri.conf.json"
+          if (Test-Path $tauriPath) {
+            $t = Get-Content $tauriPath -Raw | ConvertFrom-Json
+            $t.version = $newVersion
+            $t | ConvertTo-Json -Depth 10 | Set-Content $tauriPath
+          }
+          
+          # Update Cargo.toml
+          $cargoPath = "terax-ai-main/src-tauri/Cargo.toml"
+          if (Test-Path $cargoPath) {
+            $cargo = Get-Content $cargoPath -Raw
+            $cargo = $cargo -replace 'version = "[^"]+"', "version = `"$newVersion`""
+            Set-Content -Path $cargoPath -Value $cargo
+          }
+          
+          # Set output
+          echo "VERSION=$newVersion" >> $env:GITHUB_OUTPUT
+          echo "TAG=v$newVersion" >> $env:GITHUB_OUTPUT
+
+      - name: Install dependencies
+        working-directory: ./terax-ai-main
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and Package with Tauri
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          projectPath: ./terax-ai-main
+          tagName: v${{ steps.versioning.outputs.VERSION }}
+          releaseName: 'ZyperCode v${{ steps.versioning.outputs.VERSION }}'
+          releaseBody: 'ZyperCode automatic update with latest features, performance improvements, and bug fixes.'
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}

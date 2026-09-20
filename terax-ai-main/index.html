@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZyperCode</title>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("zypercode-ui-theme-shadow") || localStorage.getItem("terax-ui-theme-shadow");
+          var resolved = t === "light" || t === "dark" ? t : "dark";
+          localStorage.setItem("zypercode-ui-theme-shadow", resolved);
+          localStorage.setItem("zypercode-ui-theme-id-shadow", "zypercode-default");
+          document.documentElement.classList.remove("light");
+          document.documentElement.classList.add(resolved);
+          document.documentElement.style.backgroundColor =
+            resolved === "dark" ? "#141414" : "#ffffff";
+        } catch (e) {}
+
+        if (!window.__TAURI_EVENT_PLUGIN_INTERNALS__) {
+          window.__TAURI_EVENT_PLUGIN_INTERNALS__ = {
+            unregisterListener: function () {},
+          };
+        }
+
+        if (!window.__TAURI_INTERNALS__) {
+          var mockStoreData = {
+            theme: "dark",
+            themeId: "zypercode-default",
+            sessions: [],
+            activeId: null,
+          };
+          window.__TAURI_INTERNALS__ = {
+            invoke: async function (cmd, args) {
+              if (cmd === "plugin:store|load") return 1;
+              if (cmd === "plugin:store|get") {
+                var k = args && args.key;
+                if (k in mockStoreData) return [mockStoreData[k], true];
+                return [null, false];
+              }
+              if (cmd === "plugin:store|entries") {
+                return Object.entries(mockStoreData);
+              }
+              if (cmd === "plugin:store|set") {
+                if (args && args.key) mockStoreData[args.key] = args.value;
+                return null;
+              }
+              if (cmd === "plugin:store|save") return null;
+              if (cmd === "plugin:store|has") {
+                return Boolean(args && args.key in mockStoreData);
+              }
+              if (cmd === "plugin:store|keys") return Object.keys(mockStoreData);
+              if (cmd === "plugin:store|values") return Object.values(mockStoreData);
+              if (cmd === "plugin:store|delete") {
+                if (args && args.key) delete mockStoreData[args.key];
+                return true;
+              }
+              if (cmd === "get_launch_dir" || cmd === "workspace_current_dir") return "C:/Projects/ZyperCode";
+              if (cmd === "get_launch_files") return [];
+              if (cmd === "plugin:app|name") return "ZyperCode";
+              if (cmd === "plugin:app|version") return "0.9.0-beta";
+              if (cmd === "plugin:os|platform") return "windows";
+              if (cmd === "plugin:os|arch") return "x86_64";
+              if (cmd === "plugin:event|listen") return 1;
+              if (cmd === "plugin:event|unlisten") return null;
+              if (cmd === "plugin:event|emit") return null;
+              if (cmd === "plugin:window|show") return null;
+              if (cmd === "plugin:window|set_title") return null;
+              if (cmd === "pty_close_all") return null;
+              if (cmd === "secrets_get") {
+                return (args && localStorage.getItem("zypecode_sec_" + args.account)) || null;
+              }
+              if (cmd === "secrets_get_all") {
+                var accts = (args && args.accounts) || [];
+                return accts.map(function (a) { return localStorage.getItem("zypecode_sec_" + a) || null; });
+              }
+              if (cmd === "secrets_set") {
+                if (args) localStorage.setItem("zypecode_sec_" + args.account, args.password);
+                return null;
+              }
+              if (cmd === "secrets_delete") {
+                if (args) localStorage.removeItem("zypecode_sec_" + args.account);
+                return null;
+              }
+              if (cmd === "fs_read_dir") {
+                return [
+                  { name: "src", kind: "dir", size: 0, mtime: Date.now(), gitignored: false },
+                  { name: "src-tauri", kind: "dir", size: 0, mtime: Date.now(), gitignored: false },
+                  { name: "docs", kind: "dir", size: 0, mtime: Date.now(), gitignored: false },
+                  { name: "package.json", kind: "file", size: 1200, mtime: Date.now(), gitignored: false },
+                  { name: "README.md", kind: "file", size: 3400, mtime: Date.now(), gitignored: false },
+                  { name: "tsconfig.json", kind: "file", size: 800, mtime: Date.now(), gitignored: false },
+                  { name: "vite.config.ts", kind: "file", size: 500, mtime: Date.now(), gitignored: false },
+                ];
+              }
+              if (cmd === "fs_read_file") {
+                return "# Welcome to ZyperCode\n\nZyperCode is an open-source AI-native terminal emulator.";
+              }
+              if (cmd === "git_status") {
+                return { branch: "main", clean: true, files: [] };
+              }
+              if (cmd === "pty_list_shells") {
+                return [
+                  { name: "PowerShell", path: "powershell.exe", integrated: true },
+                  { name: "Command Prompt", path: "cmd.exe", integrated: true },
+                ];
+              }
+              if (cmd === "wsl_list_distros") return [];
+              if (cmd === "open_settings_window") {
+                var tab = (args && args.tab) || "general";
+                window.location.href = "/settings.html?tab=" + tab;
+                return null;
+              }
+              if (cmd === "lm_ping") return 200;
+              if (cmd === "plugin:autostart|is_enabled") return false;
+              return null;
+            },
+            transformCallback: function (cb) {
+              var id = Math.random();
+              window["_" + id] = cb;
+              return id;
+            },
+            metadata: {
+              currentWindow: { label: "main" },
+              currentWebview: { label: "main" },
+            },
+            plugins: { path: {} },
+          };
+        }
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div id="root">
+      <div id="terminal"></div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "bundle": {
+    "windows": {
+      "wix": {
+        "version": "0.0.3"
+      }
+    }
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "ZyperCode",
+        "decorations": false,
+        "transparent": true,
+        "visible": false,
+        "shadow": false
+      }
+    ]
+  }
+}

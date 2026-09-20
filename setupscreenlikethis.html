@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyperCode Setup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --desktop: #0A0A0C;
+            --window: #000000;
+            --border: #1D1C21;
+            --text: #F4F3EF;
+            --muted: #57555F;
+            --muted-2: #322F38;
+            --accent: #E7B54D;
+            --danger: #B5473C;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        body {
+            background:
+                radial-gradient(80% 60% at 50% 40%, #121116 0%, var(--desktop) 70%);
+            color: var(--text);
+            font-family: 'IBM Plex Mono', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .window {
+            width: 640px;
+            max-width: 100%;
+            min-height: 500px;
+            background: var(--window);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 60px 120px -40px #000000c0, 0 0 0 1px #ffffff05;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Title bar — PC convention: icon + name, min / max / close */
+        .titlebar {
+            height: 40px;
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 0 0 14px;
+            border-bottom: 1px solid var(--border);
+            -webkit-app-region: drag;
+        }
+
+        .app-id {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .mark {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            background: var(--accent);
+            color: #17130A;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-id span {
+            font-size: 12px;
+            color: var(--muted);
+            letter-spacing: 0.01em;
+        }
+
+        .win-controls {
+            display: flex;
+            height: 100%;
+        }
+
+        .win-controls button {
+            width: 44px;
+            height: 100%;
+            background: none;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--muted);
+            transition: background 120ms ease, color 120ms ease;
+        }
+
+        .win-controls button:hover {
+            background: #FFFFFF0D;
+            color: var(--text);
+        }
+
+        .win-controls button.close:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .win-controls svg {
+            width: 10px;
+            height: 10px;
+        }
+
+        .win-controls button:focus-visible {
+            outline: 1px solid var(--accent);
+            outline-offset: -2px;
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 52px;
+            position: relative;
+        }
+
+        #boot {
+            font-size: 12px;
+            color: var(--muted);
+            min-height: 18px;
+            margin-bottom: 26px;
+        }
+
+        .caret {
+            display: inline-block;
+            width: 6px;
+            height: 12px;
+            background: var(--accent);
+            margin-left: 3px;
+            vertical-align: -1px;
+            animation: blink 1s steps(1) infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 34px;
+            line-height: 1.12;
+            letter-spacing: -0.02em;
+            margin: 0;
+            opacity: 0;
+        }
+
+        .rule {
+            width: 0%;
+            height: 1px;
+            background: var(--accent);
+            margin: 22px 0;
+        }
+
+        p {
+            font-size: 13px;
+            line-height: 1.85;
+            color: var(--muted);
+            max-width: 40ch;
+            margin: 0;
+            opacity: 0;
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            margin-top: 38px;
+            opacity: 0;
+        }
+
+        button.txt {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        button.txt:focus-visible {
+            outline: 1px solid var(--accent);
+            outline-offset: 5px;
+            border-radius: 2px;
+        }
+
+        .btn-primary {
+            position: relative;
+            padding-bottom: 3px;
+            transition: color 160ms ease;
+        }
+
+        .btn-primary::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 1px;
+            background: var(--accent);
+            transform-origin: left;
+            transition: transform 220ms cubic-bezier(.22, .68, 0, 1.01);
+        }
+
+        .btn-primary:hover {
+            color: var(--accent);
+        }
+
+        .btn-primary:hover::after {
+            transform: scaleX(1.12);
+        }
+
+        .btn-ghost {
+            color: var(--muted);
+            transition: color 160ms ease;
+        }
+
+        .btn-ghost:hover {
+            color: var(--text);
+        }
+
+        /* progress state */
+        .progress-view {
+            display: none;
+        }
+
+        .progress-view.active {
+            display: block;
+        }
+
+        .progress-view .label {
+            font-size: 12.5px;
+            color: var(--text);
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .progress-view .label span:last-child {
+            color: var(--accent);
+        }
+
+        .track {
+            width: 100%;
+            height: 2px;
+            background: var(--muted-2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .track .fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0%;
+            background: var(--accent);
+        }
+
+        .progress-view .step {
+            font-size: 11.5px;
+            color: var(--muted);
+            margin-top: 16px;
+            min-height: 16px;
+        }
+
+        .done-actions {
+            margin-top: 38px;
+            opacity: 0;
+        }
+
+        .done-actions.in {
+            animation: fade 500ms cubic-bezier(.22, .68, 0, 1.01) forwards;
+        }
+
+        .status-bar {
+            flex: 0 0 auto;
+            border-top: 1px solid var(--border);
+            padding: 14px 52px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10.5px;
+            letter-spacing: 0.03em;
+            color: var(--muted-2);
+        }
+
+        .in {
+            animation: fade 700ms cubic-bezier(.22, .68, 0, 1.01) forwards;
+        }
+
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .window {
+                min-height: 460px;
+            }
+
+            .content {
+                padding: 0 28px;
+            }
+
+            .status-bar {
+                padding: 12px 28px;
+            }
+
+            h1 {
+                font-size: 27px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            h1,
+            p,
+            .actions {
+                opacity: 1 !important;
+                animation: none !important;
+            }
+
+            .caret {
+                animation: none;
+            }
+
+            .rule {
+                width: 40px !important;
+            }
+
+            .track .fill {
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="window">
+        <div class="titlebar">
+            <div class="app-id">
+                <div class="mark">Z</div>
+                <span>ZyperCode Setup</span>
+            </div>
+            <div class="win-controls">
+                <button aria-label="Minimize"><svg viewBox="0 0 10 10">
+                        <line x1="0" y1="5" x2="10" y2="5" stroke="currentColor" stroke-width="1" />
+                    </svg></button>
+                <button aria-label="Maximize"><svg viewBox="0 0 10 10">
+                        <rect x="0.5" y="0.5" width="9" height="9" fill="none" stroke="currentColor" stroke-width="1" />
+                    </svg></button>
+                <button class="close" aria-label="Close"><svg viewBox="0 0 10 10">
+                        <line x1="0" y1="0" x2="10" y2="10" stroke="currentColor" stroke-width="1" />
+                        <line x1="10" y1="0" x2="0" y2="10" stroke="currentColor" stroke-width="1" />
+                    </svg></button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="stage" id="stage">
+                <div id="boot">&gt; installing zypercode<span class="caret"></span></div>
+
+                <h1 id="headline">Welcome to ZyperCode</h1>
+                <div class="rule" id="rule"></div>
+
+                <p id="copy">
+                    This installs the editor, the extension host, and the command-line
+                    launcher. Setup takes about a minute and stays inside its own folder.
+                </p>
+
+                <div class="actions" id="actions">
+                    <button class="txt btn-primary" id="continue-btn">Continue</button>
+                    <button class="txt btn-ghost">Cancel</button>
+                </div>
+            </div>
+
+            <div class="progress-view" id="progress-view">
+                <div class="label"><span>Installing ZyperCode</span><span id="pct">0%</span></div>
+                <div class="track">
+                    <div class="fill" id="fill"></div>
+                </div>
+                <div class="step" id="step">copying core files</div>
+
+                <div class="done-actions" id="done-actions">
+                    <button class="txt btn-primary">Launch ZyperCode</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <span>v2.4.1</span>
+            <span>84 MB &middot; C:\Program Files\ZyperCode</span>
+        </div>
+    </div>
+
+    <script>
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const boot = document.getElementById('boot');
+        const headline = document.getElementById('headline');
+        const rule = document.getElementById('rule');
+        const copy = document.getElementById('copy');
+        const actions = document.getElementById('actions');
+
+        function runIntro() {
+            if (reduced) { rule.style.width = '40px'; return; }
+            setTimeout(() => {
+                boot.style.transition = 'opacity 400ms ease';
+                boot.style.opacity = '0';
+                headline.classList.add('in');
+            }, 850);
+            setTimeout(() => {
+                rule.style.transition = 'width 700ms cubic-bezier(.22,.68,0,1.01)';
+                rule.style.width = '40px';
+            }, 1250);
+            setTimeout(() => copy.classList.add('in'), 1500);
+            setTimeout(() => actions.classList.add('in'), 1800);
+        }
+        runIntro();
+
+        const stage = document.getElementById('stage');
+        const progressView = document.getElementById('progress-view');
+        const fill = document.getElementById('fill');
+        const pct = document.getElementById('pct');
+        const step = document.getElementById('step');
+        const doneActions = document.getElementById('done-actions');
+
+        const steps = [
+            [0, 'copying core files'],
+            [30, 'registering extension host'],
+            [60, 'writing command-line launcher'],
+            [85, 'creating shortcuts'],
+            [100, 'done']
+        ];
+
+        document.getElementById('continue-btn').addEventListener('click', () => {
+            stage.style.transition = 'opacity 250ms ease';
+            stage.style.opacity = '0';
+            setTimeout(() => {
+                stage.style.display = 'none';
+                progressView.classList.add('active');
+                animateProgress();
+            }, 250);
+        });
+
+        function animateProgress() {
+            let i = 0;
+            const dur = reduced ? 0 : 850;
+            function tick() {
+                if (i >= steps.length) return;
+                const [value, label] = steps[i];
+                fill.style.transition = reduced ? 'none' : `width ${dur}ms cubic-bezier(.22,.68,0,1.01)`;
+                fill.style.width = value + '%';
+                pct.textContent = value + '%';
+                step.textContent = label;
+                i++;
+                if (i < steps.length) {
+                    setTimeout(tick, reduced ? 0 : dur + 220);
+                } else {
+                    setTimeout(() => doneActions.classList.add('in'), reduced ? 0 : 380);
+                }
+            }
+            tick();
+        }
+    </script>
+
+</body>
+
+</html>

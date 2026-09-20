@@ -1,0 +1,11 @@
+{
+    "platforms":  {
+                      "windows-x86_64":  {
+                                             "signature":  "",
+                                             "url":  "https://github.com/zypercode/zypercode/releases/download/v0.0.4/zypercode-v0.0.4-beta-installer.exe"
+                                         }
+                  },
+    "pub_date":  "2026-09-17T17:51:14Z",
+    "version":  "0.0.4",
+    "notes":  "ZyperCode automatic update with latest improvements and bug fixes."
+}

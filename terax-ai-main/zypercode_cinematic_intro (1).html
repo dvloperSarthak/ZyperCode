@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyperCode | Cinematic Identity</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* Base Reset & Core Styles */
+        :root {
+            --bg-color: #000000; /* Pure black for maximum cinematic effect */
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --accent-glow: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-family: var(--font-sans);
+        }
+
+        /* Utility for precise hiding */
+        .visually-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Blinking Cursor Animation */
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+        .animate-blink {
+            animation: blink 1.2s step-end infinite;
+        }
+        .cursor-static {
+            animation: none !important;
+            opacity: 1 !important;
+        }
+
+        /* Cinematic Easing */
+        /* Extremely slow start, rapid acceleration, very slow finish */
+        .ease-cinematic {
+            transition-timing-function: cubic-bezier(0.87, 0, 0.13, 1);
+        }
+        
+        /* Slow, deliberate reveal */
+        .ease-slow-reveal {
+            transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        
+        /* Sharp, sudden collapse */
+        .ease-collapse {
+            transition-timing-function: cubic-bezier(0.9, 0, 0.1, 1);
+        }
+
+        /* Syntax Highlighting Colors (Extremely muted, sophisticated, monochromatic leaning) */
+        .syn-keyword { color: #71717a; font-weight: 500; } /* Zinc 500 */
+        .syn-variable { color: #e4e4e7; } /* Zinc 200 */
+        .syn-operator { color: #52525b; } /* Zinc 600 */
+        .syn-class { color: #ffffff; font-weight: 500; }
+        .syn-punctuation { color: #52525b; }
+        .syn-method { color: #a1a1aa; } /* Zinc 400 */
+
+        /* Typewriter text spans */
+        .typer-char {
+            opacity: 0;
+            display: inline-block;
+            white-space: pre;
+        }
+
+        /* Editor specific styles */
+        #editor-frame {
+            /* Full clipping state */
+            clip-path: inset(0 0 0 0); 
+            will-change: clip-path, opacity, transform;
+            background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.005) 100%);
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.05),
+                        0 20px 40px -10px rgba(0,0,0,0.8);
+        }
+        
+        #code-content {
+            font-family: var(--font-mono);
+            letter-spacing: -0.02em;
+        }
+        
+        .brand-text {
+            font-family: var(--font-sans);
+            font-weight: 300;
+            letter-spacing: 0.4em;
+        }
+    </style>
+</head>
+<body class="w-screen h-screen flex items-center justify-center bg-[#030303]">
+
+    <div id="app" class="relative w-full h-full flex items-center justify-center">
+        
+        <!-- Stage 1 & 2: The Command -->
+        <div id="stage-command" class="absolute inset-0 flex flex-col items-center justify-center opacity-0 transition-opacity duration-1000 z-10">
+            <div class="relative font-mono text-[14px] text-gray-300 flex items-center tracking-widest">
+                <span id="cmd-prefix" class="opacity-0 mr-4 text-zinc-600 transition-opacity duration-700">❯</span>
+                <span id="cmd-text" class="text-zinc-200"></span>
+                <span id="cmd-cursor" class="animate-blink font-light text-zinc-500 inline-block w-[8px] h-[16px] bg-zinc-400 translate-y-[2px] ml-[2px]"></span>
+            </div>
+            <div id="cmd-subtext" class="absolute mt-16 text-[10px] tracking-[0.3em] text-zinc-600 opacity-0 transition-opacity duration-[2000ms] ease-out font-mono">
+                INITIALIZING...
+            </div>
+        </div>
+
+        <!-- Stage 3: Wake -->
+        <div id="stage-wake" class="absolute inset-0 flex flex-col items-center justify-center opacity-0 z-20 hidden">
+            <div class="relative w-[240px] h-12 flex items-center justify-center">
+                <!-- Expanding thin line -->
+                <div id="wake-line" class="absolute left-0 right-0 h-[1px] bg-zinc-700 origin-center scale-x-0 transition-transform duration-[2000ms] ease-cinematic"></div>
+                <!-- Text elements -->
+                <div class="flex gap-[24px] z-10 brand-text text-[12px] text-zinc-300">
+                    <span id="wake-zy" class="opacity-0 translate-x-[-20px] transition-all duration-[1500ms] ease-cinematic">ZYPER</span>
+                    <span id="wake-ai" class="opacity-0 translate-x-[20px] transition-all duration-[1500ms] ease-cinematic">CORE</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stage 4 & 5: Code & Collapse -->
+        <div id="stage-code" class="absolute inset-0 flex items-center justify-center hidden z-30 perspective-1000">
+            <!-- Minimal editor surface -->
+            <div id="editor-frame" class="rounded-lg px-12 py-10 overflow-hidden flex flex-col justify-center items-start origin-center transform-gpu transition-all duration-1000 opacity-0 translate-y-4">
+                <pre id="code-content" class="text-[13px] leading-[2.4] text-left m-0 p-0 transition-opacity duration-1000 text-zinc-400 relative">
+<span class="syn-keyword">import</span> <span class="syn-punctuation">{</span> <span class="syn-class">ZyperAgent</span> <span class="syn-punctuation">}</span> <span class="syn-keyword">from</span> <span class="syn-variable">'@zypercode/core'</span><span class="syn-punctuation">;</span>
+
+<span class="syn-keyword">const</span> <span class="syn-variable">agent</span> <span class="syn-operator">=</span> <span class="syn-keyword">new</span> <span class="syn-class">ZyperAgent</span><span class="syn-punctuation">({</span>
+  <span class="syn-variable">intelligence</span><span class="syn-operator">:</span> <span class="syn-variable">'maximum'</span><span class="syn-punctuation">,</span>
+  <span class="syn-variable">mode</span><span class="syn-operator">:</span> <span class="syn-variable">'autonomous'</span>
+<span class="syn-punctuation">});</span>
+
+<span class="syn-keyword">await</span> <span class="syn-variable">agent</span><span class="syn-punctuation">.</span><span class="syn-method">execute</span><span class="syn-punctuation">();</span></pre>
+            </div>
+        </div>
+
+        <!-- Stage 6 & 7: Reveal -->
+        <div id="stage-reveal" class="absolute inset-0 flex flex-col items-center justify-center opacity-0 hidden z-40">
+            <div id="brand-container" class="relative flex flex-col items-center justify-center">
+                <div id="brand-wordmark" class="text-2xl sm:text-3xl brand-text font-light text-white opacity-0 scale-[0.98] transition-all duration-[2500ms] ease-slow-reveal ml-[0.4em] flex items-center">
+                    ZYPERCODE
+                    <span id="final-cursor" class="opacity-0 inline-block w-[12px] h-[24px] bg-zinc-300 ml-3 translate-y-[1px]"></span>
+                </div>
+                <div id="brand-subtitle" class="absolute top-16 text-[9px] tracking-[0.6em] text-zinc-500 opacity-0 transition-opacity duration-[2000ms] ml-[0.6em] font-mono">
+                    AI IDE
+                </div>
+            </div>
+        </div>
+
+        <!-- Replay Button (Appears at very end) -->
+        <button id="replay-btn" class="absolute bottom-10 right-10 text-[10px] tracking-widest text-zinc-600 hover:text-zinc-300 opacity-0 transition-opacity duration-1000 hidden uppercase font-mono cursor-pointer z-50">
+            RESTART SEQUENCE
+
+    <script>
+        // --- Utility Functions ---
+        const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        
+        // Element references
+        const el = (id) => document.getElementById(id);
+        const stageCommand = el('stage-command');
+        const cmdPrefix = el('cmd-prefix');
+        const cmdText = el('cmd-text');
+        const cmdCursor = el('cmd-cursor');
+        const cmdSubtext = el('cmd-subtext');
+        
+        const stageWake = el('stage-wake');
+        const wakeLine = el('wake-line');
+        const wakeZy = el('wake-zy');
+        const wakeAi = el('wake-ai');
+        
+        const stageCode = el('stage-code');
+        const editorFrame = el('editor-frame');
+        const codeContent = el('code-content');
+        
+        const stageReveal = el('stage-reveal');
+        const brandWordmark = el('brand-wordmark');
+        const brandSubtitle = el('brand-subtitle');
+        const finalCursor = el('final-cursor');
+        const replayBtn = el('replay-btn');
+
+        // Check for reduced motion preference
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // --- Core Typewriter Logic for Syntax Highlighted Code ---
+        let originalCodeHTML = codeContent.innerHTML;
+        
+        function prepareCodeTypewriter(container) {
+            // Convert standard DOM structure into individually hidden characters 
+            // while preserving structural DOM nodes and colors.
+            container.innerHTML = originalCodeHTML;
+            
+            const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let node;
+            while (node = walker.nextNode()) textNodes.push(node);
+
+            textNodes.forEach(textNode => {
+                const text = textNode.nodeValue;
+                const frag = document.createDocumentFragment();
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i];
+                    if (char === '\n') {
+                        frag.appendChild(document.createTextNode('\n'));
+                    } else if (char === ' ') {
+                        // Preserve spaces exactly
+                        const span = document.createElement('span');
+                        span.innerHTML = '&nbsp;';
+                        span.className = 'typer-char whitespace-pre';
+                        frag.appendChild(span);
+                    } else {
+                        const span = document.createElement('span');
+                        span.textContent = char;
+                        span.className = 'typer-char';
+                        frag.appendChild(span);
+                    }
+                }
+                textNode.parentNode.replaceChild(frag, textNode);
+            });
+        }
+
+        // --- Cinematic Sequence Orchestrator ---
+        async function runCinematicSequence() {
+            // Reset state
+            [stageCommand, stageWake, stageReveal, replayBtn].forEach(el => {
+                el.classList.add('hidden');
+                el.style.opacity = '0';
+            });
+            stageCode.classList.add('hidden');
+            cmdText.innerHTML = '';
+            cmdPrefix.style.opacity = '0';
+            cmdSubtext.style.opacity = '0';
+            wakeLine.style.transform = 'scaleX(0)';
+            wakeZy.style.opacity = '0';
+            wakeZy.style.transform = 'translateX(-20px)';
+            wakeAi.style.opacity = '0';
+            wakeAi.style.transform = 'translateX(20px)';
+            
+            // Reset editor frame
+            editorFrame.style.clipPath = 'inset(0 0 0 0)';
+            editorFrame.style.opacity = '0';
+            editorFrame.style.transform = 'translateY(16px)';
+            editorFrame.style.transition = 'all 1.5s cubic-bezier(0.22, 1, 0.36, 1)';
+            
+            codeContent.style.opacity = '1';
+            brandWordmark.style.opacity = '0';
+            brandWordmark.style.transform = 'scale(0.98)';
+            brandSubtitle.style.opacity = '0';
+            finalCursor.style.opacity = '0';
+            finalCursor.classList.remove('animate-blink');
+            cmdCursor.classList.add('animate-blink');
+            cmdCursor.style.opacity = '1';
+
+            if (prefersReducedMotion) {
+                stageReveal.classList.remove('hidden');
+                stageReveal.style.opacity = '1';
+                brandWordmark.style.opacity = '1';
+                brandWordmark.style.transform = 'scale(1)';
+                return;
+            }
+
+            // ---------------------------------------------------------
+            // 01 — BLACK (Init)
+            // ---------------------------------------------------------
+            // Pure dark background. Nothing.
+            await wait(1200);
+            
+            // A tiny monospace cursor appears exactly in the center.
+            stageCommand.classList.remove('hidden');
+            stageCommand.style.opacity = '1';
+            
+            // It blinks once. Pause.
+            await wait(1800); 
+
+            // ---------------------------------------------------------
+            // 02 — THE COMMAND
+            // ---------------------------------------------------------
+            // The cursor moves slightly to the left.
+            cmdPrefix.style.opacity = '1';
+            await wait(800);
+            
+            // Type command
+            const command = "zypercode";
+            cmdCursor.classList.remove('animate-blink'); // Solid cursor while typing
+            cmdCursor.classList.add('cursor-static');
+            
+            for (let char of command) {
+                cmdText.innerHTML += char;
+                // Realistic variable typing speed (slightly slower, more deliberate)
+                await wait(Math.random() * 80 + 60); 
+            }
+            
+            await wait(300);
+            cmdCursor.classList.remove('cursor-static');
+            cmdCursor.classList.add('animate-blink');
+
+            // Small pause, then subtle subtext
+            await wait(1000);
+            cmdSubtext.style.opacity = '0.5';
+            
+            // Hold before Wake
+            await wait(2500);
+
+            // Fade out Stage 1 very smoothly
+            stageCommand.style.opacity = '0';
+            await wait(1200);
+            stageCommand.classList.add('hidden');
+
+            // ---------------------------------------------------------
+            // 03 — WAKE
+            // ---------------------------------------------------------
+            // The screen remains almost completely black.
+            // A very thin horizontal line appears.
+            stageWake.classList.remove('hidden');
+            stageWake.style.opacity = '1';
+            
+            await wait(500);
+            wakeLine.style.transform = 'scaleX(1)';
+            
+            await wait(1200);
+            
+            // At the center: ZYPER CORE appears very subtly.
+            wakeZy.style.opacity = '1';
+            wakeZy.style.transform = 'translateX(0)';
+            
+            wakeAi.style.opacity = '1';
+            wakeAi.style.transform = 'translateX(0)';
+            
+            // Hold the alignment
+            await wait(2500);
+
+            // Fade out wake stage smoothly
+            stageWake.style.transition = 'opacity 1.5s ease-out';
+            stageWake.style.opacity = '0';
+            await wait(1500);
+            stageWake.classList.add('hidden');
+            stageWake.style.transition = ''; // reset
+
+            // ---------------------------------------------------------
+            // 04 — CODE
+            // ---------------------------------------------------------
+            // Hard cut to a minimal editor surface.
+            prepareCodeTypewriter(codeContent);
+            stageCode.classList.remove('hidden');
+            
+            // Reveal editor frame softly
+            await wait(100);
+            editorFrame.style.opacity = '1';
+            editorFrame.style.transform = 'translateY(0)';
+            
+            // Create a solid cursor for the code block
+            const codeCursor = document.createElement('span');
+            codeCursor.className = 'inline-block w-[7px] h-[15px] bg-zinc-300 translate-y-[2px] ml-[1px] transition-opacity duration-75';
+            
+            // Insert initially at the beginning
+            codeContent.insertBefore(codeCursor, codeContent.firstChild);
+            
+            await wait(1000);
+
+            // Type the code naturally
+            const chars = codeContent.querySelectorAll('.typer-char');
+            for (let i = 0; i < chars.length; i++) {
+                const char = chars[i];
+                char.style.opacity = '1';
+                
+                // Move cursor directly after the revealed character
+                char.parentNode.insertBefore(codeCursor, char.nextSibling);
+                
+                // Typing rhythm: extremely deliberate
+                let delay = Math.random() * 15 + 10;
+                
+                // Pause at ends of lines or special characters
+                if (char.textContent === '\n') {
+                    delay += 150; // Carriage return pause
+                } else if (['{', '}', ';'].includes(char.textContent)) {
+                    delay += 80;
+                } else if (char.textContent === ' ') {
+                    delay += 5;
+                }
+                
+                await wait(delay);
+            }
+            
+            // Blink cursor at the end of typing
+            codeCursor.classList.add('animate-blink');
+
+            // ---------------------------------------------------------
+            // 05 — THE CINEMATIC MOMENT
+            // ---------------------------------------------------------
+            // Everything freezes.
+            await wait(2500);
+            
+            // The cursor stops. The code slowly fades away.
+            codeCursor.style.opacity = '0';
+            codeCursor.classList.remove('animate-blink');
+            await wait(400);
+            codeContent.style.opacity = '0';
+            
+            await wait(1500);
+
+            // The editor frame itself begins shrinking toward the center.
+            // The entire interface becomes a thin line.
+            editorFrame.style.transition = 'all 1.5s cubic-bezier(0.87, 0, 0.13, 1)';
+            editorFrame.style.clipPath = 'inset(49.8% 0 49.8% 0)'; 
+            editorFrame.style.transform = 'scale(0.95)';
+            editorFrame.style.background = 'transparent';
+            editorFrame.style.boxShadow = 'none';
+            
+            await wait(1400);
+
+            // The line collapses into a single point.
+            editorFrame.style.transition = 'all 0.8s cubic-bezier(0.9, 0, 0.1, 1)';
+            editorFrame.style.clipPath = 'inset(49.8% 50% 49.8% 50%)';
+            
+            await wait(900);
+            
+            // Silence. Black screen. Hold for a fraction of a second.
+            stageCode.classList.add('hidden');
+            
+            await wait(800);
+
+            // ---------------------------------------------------------
+            // 06 — ZYPERCODE REVEAL
+            // ---------------------------------------------------------
+            stageReveal.classList.remove('hidden');
+            
+            // Precise, elegant reveal
+            await wait(50);
+            stageReveal.style.opacity = '1';
+            brandWordmark.style.opacity = '1';
+            brandWordmark.style.transform = 'scale(1)';
+            
+            await wait(1800);
+            
+            // Subtitle appears
+            brandSubtitle.style.opacity = '1';
+            
+            await wait(3500);
+
+            // ---------------------------------------------------------
+            // 07 — FINAL BEAT
+            // ---------------------------------------------------------
+            // Subtitle disappears
+            brandSubtitle.style.opacity = '0';
+            
+            await wait(1500);
+            
+            // Tiny terminal cursor appears at the end
+            finalCursor.style.opacity = '1';
+            
+            // Cursor blinks once
+            await wait(600);
+            finalCursor.style.opacity = '0';
+            await wait(600);
+            finalCursor.style.opacity = '1';
+            
+            await wait(1200);
+
+            // Then everything cuts to black. END.
+            stageReveal.style.transition = 'opacity 1s cubic-bezier(0.9, 0, 0.1, 1)';
+            stageReveal.style.opacity = '0';
+            
+            await wait(1200);
+            stageReveal.classList.add('hidden');
+            stageReveal.style.transition = ''; // reset
+            
+            // Show Replay Button quietly
+            replayBtn.classList.remove('hidden');
+            setTimeout(() => {
+                replayBtn.style.opacity = '1';
+            }, 500);
+        }
+
+        // Initialize event listeners and start
+        replayBtn.addEventListener('click', () => {
+            runCinematicSequence();
+        });
+
+        // Trigger sequence on load
+        window.onload = () => {
+            // Small initial buffer before starting the cinematic
+            setTimeout(runCinematicSequence, 500);
+        };
+    </script>
+</body>
+</html>

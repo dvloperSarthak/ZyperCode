@@ -66,7 +66,11 @@ if (-not $SkipBuild) {
     Write-Host "[+] Building ZyperCode v$TargetVersion with Tauri (target: x86_64-pc-windows-gnu)..." -ForegroundColor Cyan
     Push-Location $ProjectDir
     try {
+        $env:RUST_MIN_STACK = "67108864"
         pnpm run release:windows
+        if ($LASTEXITCODE -ne 0) {
+            throw "Tauri build failed with exit code $LASTEXITCODE"
+        }
     } finally {
         Pop-Location
     }

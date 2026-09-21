@@ -110,8 +110,8 @@ tauri-plugin-window-state = "2"
 incremental = true
 
 [profile.release]
-codegen-units = 1
-lto = "fat"
+codegen-units = 16
+lto = "thin"
 opt-level = "s"
 panic = "abort"
 strip = true
@@ -120,6 +120,7 @@ strip = true
 # at compile time on macOS, reported as a bogus E0463. Never shipped, so nothing to strip.
 [profile.release.build-override]
 strip = false
+
 
 
 

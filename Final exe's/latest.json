@@ -2,10 +2,10 @@
     "platforms":  {
                       "windows-x86_64":  {
                                              "signature":  "",
-                                              "url":  "https://github.com/dvloperSarthak/ZyperCode/releases/download/v0.0.4/zypercode-v0.0.4-beta-installer.exe"
-                                          }
+                                             "url":  "https://github.com/dvloperSarthak/ZyperCode/releases/download/v1.0.1/zypercode-v1.0.1-beta-installer.exe"
+                                         }
                   },
-    "pub_date":  "2026-09-17T17:51:14Z",
-    "version":  "0.0.4",
-    "notes":  "ZyperCode automatic update with latest improvements and bug fixes."
+    "pub_date":  "2026-09-21T15:56:44Z",
+    "version":  "1.0.1",
+    "notes":  "ZyperCode v1.0.1 Official Release: All previous errors resolved, high-performance multi-provider AI engine, OpenRouter free models auto-scraper, zero-CORS proxying, keyring credential migration, seamless dual-channel auto-update fetch, and complete ZyperCode unified branding."
 }

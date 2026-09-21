@@ -150,10 +150,8 @@ if (-not $NoGit) {
         git tag -a "v$TargetVersion" -m "ZyperCode Release v$TargetVersion" -f
         
         $remotes = git remote
-        if ($remotes) {
-            Write-Host "[+] Pushing to Git remote with tags..." -ForegroundColor Cyan
-            git push origin HEAD --tags
-        }
+            Write-Host "[+] Pushing to Git remote (main) with tags..." -ForegroundColor Cyan
+            git push origin main --tags
         
         if ($hasGh) {
             Write-Host "[+] GitHub CLI detected. Publishing GitHub Release..." -ForegroundColor Cyan

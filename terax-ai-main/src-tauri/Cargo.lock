@@ -5354,7 +5354,7 @@ dependencies = [
 
 [[package]]
 name = "terax"
-version = "0.0.3"
+version = "1.0.1"
 dependencies = [
  "block2",
  "bytes",
@@ -5395,15 +5395,15 @@ dependencies = [
  "tempfile",
  "terax-control-protocol",
  "tokio",
- "wasmparser",
+ "wasmparser 0.226.0",
  "which",
  "window-vibrancy 0.8.0",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
 name = "terax-cli"
-version = "0.0.3"
+version = "1.0.1"
 dependencies = [
  "dirs 6.0.0",
  "libc",
@@ -5415,7 +5415,7 @@ dependencies = [
 
 [[package]]
 name = "terax-control-protocol"
-version = "0.0.3"
+version = "1.0.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -6097,7 +6097,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "990065f2fe63003fe337b932cfb5e3b80e0b4d0f5ff650e6985b1048f62c8319"
 dependencies = [
  "leb128fmt",
- "wasmparser",
+ "wasmparser 0.244.0",
 ]
 
 [[package]]
@@ -6109,7 +6109,7 @@ dependencies = [
  "anyhow",
  "indexmap 2.14.0",
  "wasm-encoder",
- "wasmparser",
+ "wasmparser 0.244.0",
 ]
 
 [[package]]
@@ -6136,6 +6136,16 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
+]
+
+[[package]]
+name = "wasmparser"
+version = "0.226.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc28600dcb2ba68d7e5f1c3ba4195c2bddc918c0243fd702d0b6dbd05689b681"
+dependencies = [
+ "bitflags 2.11.1",
+ "indexmap 2.14.0",
 ]
 
 [[package]]
@@ -6944,7 +6954,7 @@ dependencies = [
  "serde_json",
  "wasm-encoder",
  "wasm-metadata",
- "wasmparser",
+ "wasmparser 0.244.0",
  "wit-parser",
 ]
 
@@ -6963,7 +6973,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "unicode-xid",
- "wasmparser",
+ "wasmparser 0.244.0",
 ]
 
 [[package]]

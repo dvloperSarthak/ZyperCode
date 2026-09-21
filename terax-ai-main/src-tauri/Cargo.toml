@@ -1,6 +1,6 @@
 [package]
 name = "terax"
-version = "0.0.4"
+version = "1.0.1"
 description = "ZyperCode — an open-source AI-native terminal emulator"
 authors = ["crynta"]
 license = "Apache-2.0"
@@ -13,7 +13,7 @@ default-members = [".", "crates/terax-cli", "crates/terax-control-protocol"]
 resolver = "2"
 
 [workspace.package]
-version = "0.0.4"
+version = "1.0.1"
 edition = "2021"
 license = "Apache-2.0"
 
@@ -120,6 +120,7 @@ strip = true
 # at compile time on macOS, reported as a bogus E0463. Never shipped, so nothing to strip.
 [profile.release.build-override]
 strip = false
+
 
 
 

@@ -6,7 +6,7 @@ import { IS_LINUX } from "@/lib/platform";
 
 const LAST_CHECK_KEY = "zypercode:updater:last-check";
 const CHECK_INTERVAL_MS = 60 * 60 * 1000; // 1 hour throttle for automatic startup checks
-export const DEFAULT_GITHUB_REPO = "zypercode/zypercode";
+export const DEFAULT_GITHUB_REPO = "dvloperSarthak/ZyperCode";
 export const GITHUB_LATEST_RELEASE = `https://api.github.com/repos/${DEFAULT_GITHUB_REPO}/releases/latest`;
 
 export interface ManualUpdateInfo {
@@ -87,7 +87,7 @@ function normalizeErrorMessage(err: unknown): string {
   return str;
 }
 
-async function checkLinuxRelease(currentVersion: string): Promise<ManualUpdateInfo | null> {
+async function checkGitHubRelease(currentVersion: string): Promise<ManualUpdateInfo | null> {
   const res = await fetch(GITHUB_LATEST_RELEASE, {
     headers: { Accept: "application/vnd.github+json" },
   });
@@ -160,7 +160,7 @@ export const useUpdaterStore = create<UpdaterStore>((set, get) => ({
 
     try {
       if (IS_LINUX) {
-        const info = await checkLinuxRelease(currentVer);
+        const info = await checkGitHubRelease(currentVer);
         if (info) {
           set({
             status: { kind: "manual-available", info },
@@ -173,22 +173,43 @@ export const useUpdaterStore = create<UpdaterStore>((set, get) => ({
         return;
       }
 
-      const update = await check();
-      if (update && isNewer(update.version, currentVer)) {
-        set({
-          status: {
-            kind: "available",
-            update,
-            version: update.version,
-            body: update.body,
-            date: update.date,
-          },
-          dialogOpen: true,
-        });
-      } else {
-        localStorage.setItem(LAST_CHECK_KEY, String(Date.now()));
-        set({ status: { kind: "uptodate", version: currentVer } });
+      let nativeChecked = false;
+      try {
+        const update = await check();
+        nativeChecked = true;
+        if (update && isNewer(update.version, currentVer)) {
+          set({
+            status: {
+              kind: "available",
+              update,
+              version: update.version,
+              body: update.body,
+              date: update.date,
+            },
+            dialogOpen: true,
+          });
+          return;
+        }
+      } catch (nativeErr) {
+        console.warn("[zypercode-updater] Native check failed, falling back to GitHub Releases API:", nativeErr);
       }
+
+      // Secondary fallback directly to GitHub Releases API (e.g. unsigned releases or portable exe)
+      try {
+        const ghInfo = await checkGitHubRelease(currentVer);
+        if (ghInfo) {
+          set({
+            status: { kind: "manual-available", info: ghInfo },
+            dialogOpen: true,
+          });
+          return;
+        }
+      } catch (ghErr) {
+        if (!nativeChecked) throw ghErr;
+      }
+
+      localStorage.setItem(LAST_CHECK_KEY, String(Date.now()));
+      set({ status: { kind: "uptodate", version: currentVer } });
     } catch (err) {
       const errMsg = normalizeErrorMessage(err);
       if (!manual) {

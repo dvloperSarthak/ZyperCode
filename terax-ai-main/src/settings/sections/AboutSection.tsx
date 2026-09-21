@@ -9,7 +9,7 @@ import { arch, platform } from "@tauri-apps/plugin-os";
 import { useEffect, useState } from "react";
 import { SectionHeader } from "../components/SectionHeader";
 
-const REPO_URL = "https://github.com/zypercode/zypercode";
+const REPO_URL = "https://github.com/dvloperSarthak/ZyperCode";
 
 function openExternalUrl(url: string) {
   try {

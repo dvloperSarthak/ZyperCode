@@ -8,12 +8,12 @@
     ·
     <a href="https://zypercode.com/docs">Docs</a>
     ·
-    <a href="https://github.com/zypercode/zypercode">GitHub</a>
+    <a href="https://github.com/dvloperSarthak/ZyperCode">GitHub</a>
   </p>
 
   <p>
-    <img src="https://img.shields.io/github/v/release/zypercode/zypercode?label=version&color=blue" alt="version" />
-    <img src="https://img.shields.io/github/downloads/zypercode/zypercode/total?label=downloads&color=blue" alt="downloads" />
+    <img src="https://img.shields.io/github/v/release/dvloperSarthak/ZyperCode?label=version&color=blue" alt="version" />
+    <img src="https://img.shields.io/github/downloads/dvloperSarthak/ZyperCode/total?label=downloads&color=blue" alt="downloads" />
     <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey" alt="platform" />
   </p>
 </div>
@@ -113,7 +113,7 @@ ZyperCode is a lightweight open-source terminal-first AI-native development envi
 
 ## Install
 
-Latest installers are on the [Releases](https://github.com/zypercode/zypercode/releases/latest) page. ZyperCode auto-updates from there.
+Latest installers are on the [Releases](https://github.com/dvloperSarthak/ZyperCode/releases/latest) page. ZyperCode auto-updates from there.
 
 ### Windows notes
 
@@ -123,7 +123,7 @@ Latest installers are on the [Releases](https://github.com/zypercode/zypercode/r
 ### Linux notes
 
 - **Arch / AUR:** `yay -S zypercode-bin` (or `paru`, etc.). Tracks the latest release.
-- **NixOS / Nix**: use the official flake - `nix profile install github:zypercode/zypercode` (non-NixOS), or import the flake and add `inputs.zypercode.packages.${pkgs.system}.zypercode` to `environment.systemPackages` (NixOS).
+- **NixOS / Nix**: use the official flake - `nix profile install github:dvloperSarthak/ZyperCode` (non-NixOS), or import the flake and add `inputs.zypercode.packages.${pkgs.system}.zypercode` to `environment.systemPackages` (NixOS).
 - **AppImage:** needs FUSE. Without it: `./ZyperCode_*.AppImage --appimage-extract-and-run`. On Wayland with rendering glitches, try `WEBKIT_DISABLE_DMABUF_RENDERER=1`. Otherwise the `.deb` / `.rpm` packages link against the system GTK stack and tend to be smoother.
 
 ## Configure AI

@@ -121,7 +121,7 @@ $Manifest = @{
     platforms = @{
         "windows-x86_64" = @{
             signature = ""
-            url = "https://github.com/zypercode/zypercode/releases/download/v${TargetVersion}/zypercode-v${TargetVersion}-beta-installer.exe"
+            url = "https://github.com/dvloperSarthak/ZyperCode/releases/download/v${TargetVersion}/zypercode-v${TargetVersion}-beta-installer.exe"
         }
     }
 }
@@ -132,6 +132,13 @@ Write-Host "[+] Update manifest written to: $ManifestPath" -ForegroundColor Gree
 
 # 7. Git Commit & GitHub Release (Auto Push Update)
 if (-not $NoGit) {
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        if (Test-Path "C:\Program Files\Git\cmd\git.exe") {
+            $env:PATH = "C:\Program Files\Git\cmd;" + $env:PATH
+        } elseif (Test-Path "$env:LOCALAPPDATA\Programs\Git\cmd\git.exe") {
+            $env:PATH = "$env:LOCALAPPDATA\Programs\Git\cmd;" + $env:PATH
+        }
+    }
     $hasGit = Get-Command git -ErrorAction SilentlyContinue
     $hasGh = Get-Command gh -ErrorAction SilentlyContinue
     

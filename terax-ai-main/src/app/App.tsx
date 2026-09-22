@@ -30,6 +30,11 @@ import {
 } from "@/modules/ai";
 import { AiComposerProvider } from "@/modules/ai/lib/composer";
 import { native } from "@/modules/ai/lib/native";
+import {
+  ByokSetupScreen,
+  ByokSplashLoading,
+  useCredentialGate,
+} from "@/modules/byok";
 import { CommandPalette, createCommandItems } from "@/modules/command-palette";
 import { useControlBridge } from "@/modules/control";
 import {
@@ -38,6 +43,7 @@ import {
   useApplyEditorFontSize,
   useEditorFileSync,
 } from "@/modules/editor";
+import { ExtensionsPanel } from "@/modules/extensions";
 import { FileExplorer, type FileExplorerHandle } from "@/modules/explorer";
 import type { GitHistorySearchHandle } from "@/modules/git-history";
 import {
@@ -137,7 +143,7 @@ import {
 import { useTabCloseGuards } from "./hooks/useTabCloseGuards";
 import { useWorkspaceSwitcher } from "./hooks/useWorkspaceSwitcher";
 
-export default function App() {
+function IdeShell() {
   const {
     tabs,
     activeId,
@@ -1494,7 +1500,7 @@ export default function App() {
                           onAttachToAgent={handleAttachFileToAgent}
                           pathDropTarget={terminalPathDropTarget}
                         />
-                      ) : (
+                      ) : sidebarView === "source-control" ? (
                         <SourceControlPanel
                           open
                           sourceControl={sourceControl}
@@ -1507,6 +1513,8 @@ export default function App() {
                             handleFollowRepositoryContext
                           }
                         />
+                      ) : (
+                        <ExtensionsPanel />
                       )}
                     </div>
                     <SidebarRail
@@ -1660,3 +1668,35 @@ export default function App() {
 
   return <AiComposerProvider>{shell}</AiComposerProvider>;
 }
+
+export default function App() {
+  const {
+    state: credentialState,
+    saveKey,
+    skip,
+    errorMessage,
+  } = useCredentialGate();
+
+  if (credentialState === "CHECKING") {
+    return (
+      <ThemeProvider>
+        <ByokSplashLoading />
+      </ThemeProvider>
+    );
+  }
+
+  if (credentialState === "NO_KEY") {
+    return (
+      <ThemeProvider>
+        <ByokSetupScreen
+          onSave={saveKey}
+          onSkip={skip}
+          externalError={errorMessage}
+        />
+      </ThemeProvider>
+    );
+  }
+
+  return <IdeShell />;
+}
+

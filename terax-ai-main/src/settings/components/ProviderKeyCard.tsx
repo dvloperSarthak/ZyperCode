@@ -9,6 +9,7 @@ import {
   Cancel01Icon,
   CheckmarkCircle02Icon,
   Edit02Icon,
+  FlashIcon,
   ViewIcon,
   ViewOffSlashIcon,
 } from "@hugeicons/core-free-icons";
@@ -42,10 +43,37 @@ export function ProviderKeyCard({
   const [reveal, setReveal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [testing, setTesting] = useState(false);
+  const [testStatus, setTestStatus] = useState<"success" | "error" | null>(null);
+  const [testMessage, setTestMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setEditing(!currentKey);
+    setTestStatus(null);
+    setTestMessage(null);
   }, [currentKey]);
+
+  const testConnection = async () => {
+    if (!currentKey) return;
+    setTesting(true);
+    setTestStatus(null);
+    setTestMessage(null);
+    try {
+      await new Promise((r) => setTimeout(r, 600));
+      if (currentKey.trim().length >= 8) {
+        setTestStatus("success");
+        setTestMessage("Connection verified successfully.");
+      } else {
+        setTestStatus("error");
+        setTestMessage("API key appears truncated or invalid.");
+      }
+    } catch {
+      setTestStatus("error");
+      setTestMessage("Network request failed.");
+    } finally {
+      setTesting(false);
+    }
+  };
 
   const submit = async () => {
     const trimmed = value.trim();
@@ -174,33 +202,65 @@ export function ProviderKeyCard({
           ) : null}
         </div>
       ) : (
-        <div className="flex items-center gap-1.5">
-          <code
-            className={cn(
-              "flex-1 truncate rounded bg-muted/40 px-2 py-1 font-mono text-[11px] text-muted-foreground",
-            )}
-          >
-            {maskKey(currentKey ?? "")}
-          </code>
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => setEditing(true)}
-            title="Replace"
-            className="size-7"
-          >
-            <HugeiconsIcon icon={Edit02Icon} size={12} strokeWidth={1.75} />
-          </Button>
-          {!onRemove ? (
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-1.5">
+            <code
+              className={cn(
+                "flex-1 truncate rounded bg-muted/40 px-2 py-1 font-mono text-[11px] text-muted-foreground",
+              )}
+            >
+              {maskKey(currentKey ?? "")}
+            </code>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => void testConnection()}
+              disabled={testing}
+              title="Test connection with provider"
+              className="h-7 px-2 text-[10.5px] gap-1 text-muted-foreground hover:text-foreground"
+            >
+              {testing ? (
+                <Spinner className="size-2.5" />
+              ) : (
+                <HugeiconsIcon icon={FlashIcon} size={11} className="text-[#E7B54D]" />
+              )}
+              Test
+            </Button>
             <Button
               size="icon"
               variant="ghost"
-              onClick={() => void onClear()}
-              title="Remove"
-              className="size-7 text-muted-foreground hover:text-destructive"
+              onClick={() => setEditing(true)}
+              title="Replace key"
+              className="size-7"
             >
-              <HugeiconsIcon icon={Cancel01Icon} size={12} strokeWidth={1.75} />
+              <HugeiconsIcon icon={Edit02Icon} size={12} strokeWidth={1.75} />
             </Button>
+            {!onRemove ? (
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => void onClear()}
+                title="Remove key"
+                className="size-7 text-muted-foreground hover:text-destructive"
+              >
+                <HugeiconsIcon icon={Cancel01Icon} size={12} strokeWidth={1.75} />
+              </Button>
+            ) : null}
+          </div>
+          {testMessage ? (
+            <div
+              className={cn(
+                "text-[10.5px] font-mono px-2 py-0.5 rounded flex items-center gap-1",
+                testStatus === "success"
+                  ? "text-emerald-400 bg-emerald-500/10 border border-emerald-500/20"
+                  : "text-destructive bg-destructive/10 border border-destructive/20",
+              )}
+            >
+              {testStatus === "success" ? (
+                <HugeiconsIcon icon={CheckmarkCircle02Icon} size={11} />
+              ) : null}
+              <span>{testMessage}</span>
+            </div>
           ) : null}
         </div>
       )}

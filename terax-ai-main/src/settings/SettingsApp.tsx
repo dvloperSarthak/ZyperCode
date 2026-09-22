@@ -10,6 +10,7 @@ import {
   InformationCircleIcon,
   KeyboardIcon,
   PaintBoardIcon,
+  PuzzleIcon,
   Settings01Icon,
   SourceCodeIcon,
   UserMultiple02Icon,
@@ -20,6 +21,7 @@ import { type JSX, useCallback, useEffect, useState } from "react";
 import { AboutSection } from "./sections/AboutSection";
 import { AgentsSection } from "./sections/AgentsSection";
 import { EditorSection } from "./sections/EditorSection";
+import { ExtensionsSection } from "./sections/ExtensionsSection";
 import { GeneralSection } from "./sections/GeneralSection";
 import { ModelsSection } from "./sections/ModelsSection";
 import { ShortcutsSection } from "./sections/ShortcutsSection";
@@ -63,6 +65,12 @@ const TABS: {
     component: AgentsSection,
   },
   {
+    id: "extensions",
+    label: "Extensions",
+    icon: PuzzleIcon,
+    component: ExtensionsSection,
+  },
+  {
     id: "about",
     label: "About",
     icon: InformationCircleIcon,
@@ -77,6 +85,7 @@ const VALID_TABS: SettingsTab[] = [
   "shortcuts",
   "models",
   "agents",
+  "extensions",
   "about",
 ];
 

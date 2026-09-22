@@ -1,0 +1,18 @@
+{
+  "name": "zypercode-landing-website",
+  "version": "1.0.1",
+  "description": "ZyperCode official landing website - Terminal-first AI-native dev workspace",
+  "scripts": {
+    "dev": "npx -y serve . -l 3000",
+    "start": "npx -y serve . -l 3000",
+    "build": "echo 'Static website ready'"
+  },
+  "keywords": [
+    "zypercode",
+    "ai-terminal",
+    "ai-ide",
+    "developer-tools"
+  ],
+  "author": "ZyperCode Team",
+  "license": "Apache-2.0"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "zypercode-workspace",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node ./scripts/build-landing.mjs",
+    "start": "npm --prefix zypercode-landing-website start"
+  }
+}
